@@ -1,0 +1,11 @@
+RewriteEngine On
+
+RewriteRule ^$ /public/ [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ /public/$1
+
+RewriteCond %{SCRIPT_FILENAME} -d
+RewriteRule ^jekyll/(.*[^/])$ https://laravel.idex.cc/$1/ [R=301]

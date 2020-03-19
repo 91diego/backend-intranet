@@ -1,0 +1,4 @@
+Vivienda             RFC           FechaVenta       FechaEscritura   FechaEntrega     FechaAvaluo      FechaLiberacion  Notaria                                                                                              NumeroEscritura
+-------------------- ------------- ---------------- ---------------- ---------------- ---------------- ---------------- ---------------------------------------------------------------------------------------------------- --------------------
+TL-01-PB-PB6         RERG750121F5A 2017-08-02 00:00 2019-09-13 00:00             NULL             NULL 2019-09-18 00:00 NOTARIA 18 TLAQUEPAQUE                                                                               31,983
+TL-01-PB-PB7         GUSA7502263T4 2017-08-02 00:00 2019-09-03 00:00             NULL             NULL             NULL NOTARIA 18 TLAQUEPAQUE                                                                               31,923
