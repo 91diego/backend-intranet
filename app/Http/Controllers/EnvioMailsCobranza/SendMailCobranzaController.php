@@ -28,9 +28,9 @@ class SendMailCobranzaController extends Controller
         if(!empty($data)) {
 
             // REPORTE ENVIADO A CLEMENTE
-            Mail::to('dgonzalez@idex.cc')
+            Mail::to('jgg@idex.cc')
             // ->cc('dgonzalez@idex.cc')
-            // ->bcc('jbasurto@idex.cc')
+            ->bcc('dgonzalez@idex.cc')
             ->send(new NotificacionPagos($data, $pathPDF));
         }
     }
