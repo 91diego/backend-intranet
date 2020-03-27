@@ -17,13 +17,14 @@ class Notificaciones extends Mailable
     public $informacionPagos;
     public $pdf;
     public $referencia;
+    public $subject;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($data, $financial, $ultimoPago, $saldoVencido, $totalPagado, $pathPDF)
+    public function __construct($data, $financial, $ultimoPago, $saldoVencido, $totalPagado, $pathPDF, $subject)
     {
         // Array para almacenar la informacion del estado de cuenta
         $layoutEstadoCuenta = [];
@@ -32,6 +33,7 @@ class Notificaciones extends Mailable
         $this->sendMailCobranza = $data;
         $this->informacionPagos = $financial;
         $this->path = $pathPDF;
+        $this->subject = $subject;
  
         set_time_limit(100000);
         for ($i=1; $i < count($this->informacionPagos); $i++) {
@@ -106,7 +108,7 @@ class Notificaciones extends Mailable
     public function build()
     {
 
-        return $this->subject('Le recordamos que se acerca su fecha de corte')
+        return $this->subject($this->subject)
         ->view('mail.cobranza', [
             'cliente' => $this->sendMailCobranza['cliente'],
             'torre' => $this->sendMailCobranza['torre'],

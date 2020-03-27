@@ -41,7 +41,7 @@ class SendMailCobranzaController extends Controller
      * @param  int $numberRows
      * @param  string $type
      */
-    public function emailSending($data, $financial, $numberRows, $pathPDF) {
+    public function emailSending($data, $financial, $numberRows, $pathPDF, $subject) {
 
         // ACUMULA EL TOTAL PAGADO SIEMPRE Y CUANDO EL MONTO PAGO SEA IGUAL A 0
         $totalPagado = 0;
@@ -140,7 +140,7 @@ class SendMailCobranzaController extends Controller
             Mail::to('dgonzalez@idex.cc')
             // ->cc('dgonzalez@idex.cc')
             ->bcc('diego.gonzalez.glez91@gmail.com', 'diegoaglez91@gmail.com')
-            ->send(new Notificaciones($data[$i], $informacionPagos, $ultimoPago, $acumuladoSaldoVencido, $totalPagado, $pathPDF));
+            ->send(new Notificaciones($data[$i], $informacionPagos, $ultimoPago, $acumuladoSaldoVencido, $totalPagado, $pathPDF, $subject));
         }
     }
 
@@ -449,10 +449,10 @@ class SendMailCobranzaController extends Controller
         $pathReportePDF = storage_path().'\cobranza\pdf\reporte_plan_credito.pdf';
         $this->path = storage_path().'\cobranza\pdf\edo_cuenta.pdf';
         set_time_limit(100000);
-        $this->emailSending($informacionAlertaPago, $estadoCuentaN1, $totalInformacionAlertaPago, $this->path);
-        $this->emailSending($informacionAdvertenciaPago1, $estadoCuentaA1, $totalAdvertenciaPago1, $this->path);
-        $this->emailSending($informacionAdvertenciaPago2, $estadoCuentaA2, $totalAdvertenciaPago2, $this->path);
-        $this->emailSending($informacionAdvertenciaPago3, $estadoCuentaA3, $totalAdvertenciaPago3, $this->path);
+        $this->emailSending($informacionAlertaPago, $estadoCuentaN1, $totalInformacionAlertaPago, $this->path, "Estimado cliente, le recordamos que su proxima fecha de pago es en 7 dias.");
+        $this->emailSending($informacionAdvertenciaPago1, $estadoCuentaA1, $totalAdvertenciaPago1, $this->path, "Estimado cliente, le recordamos que existe un atraso de 7 dias en su pago.");
+        $this->emailSending($informacionAdvertenciaPago2, $estadoCuentaA2, $totalAdvertenciaPago2, $this->path, "Estimado cliente, le recordamos que existe un atraso de 90 dias en su pago.");
+        $this->emailSending($informacionAdvertenciaPago3, $estadoCuentaA3, $totalAdvertenciaPago3, $this->path, "Estimado cliente, le recordamos que existe un atraso de 120 dias en su pago.");
 
         /* ENVIO DEL REPORTE CON LOS CLIENTES PROXIMOS A ENTREGAR.
         SI EL ARRAY NO CONTIENE INFORMACION, NO SE REALIZA NINGUNA ENVIO. */
