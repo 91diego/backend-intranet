@@ -42,7 +42,7 @@
                                                             <tr>
                                                                 <td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
                                                                     <h3 class="null" style="text-align: left;"><span style="font-size:19px"><span style="font-family:source sans pro,helvetica neue,helvetica,arial,sans-serif"><span style="color:#33cccc">Estimado {{ $cliente }}</span></span></span><br>&nbsp;</h3>
-                                                                    <div style="text-align: center;"><font face="source sans pro, helvetica neue, helvetica, arial, sans-serif" size="3">Por este medio le recordamos que se acerca la fecha de pago de la mensualidad del Departamento que&nbsp;adquirió&nbsp;en el desarrollo inmobiliario denominado.</font></div>
+                                                                    <div style="text-align: center;"><font face="source sans pro, helvetica neue, helvetica, arial, sans-serif" size="3">Por este medio le recordamos que se acerca la fecha de pago de la mensualidad del Departamento que&nbsp;adquirió&nbsp;en el desarrollo inmobiliario denominado {{ $desarrollo }}.</font></div>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
