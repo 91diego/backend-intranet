@@ -139,7 +139,7 @@ class SendMailCobranzaController extends Controller
             // Mail::to($data[$i]["email"])
             Mail::to('dgonzalez@idex.cc')
             // ->cc('dgonzalez@idex.cc')
-            ->bcc('diego.gonzalez.glez91@gmail.com', 'diegoaglez91@gmail.com')
+            ->bcc('mrojas@idex.cc', 'cmata@idex.cc', 'bat@idex.cc', 'ti-sistemas@idex.cc', 'jbasurto@idex.cc')
             ->send(new Notificaciones($data[$i], $informacionPagos, $ultimoPago, $acumuladoSaldoVencido, $totalPagado, $pathPDF, $subject));
         }
     }
@@ -254,7 +254,7 @@ class SendMailCobranzaController extends Controller
             $adeudoCliente = (float)$registros[$i]['SaldoPendiente'];
 
             // ENVIO 7 DIAS ANTES DE SU PAGO
-            if ( (/* $diferenciaDias == -7*/ $diferenciaDias <= -1 && $diferenciaDias >= -2) && $adeudoCliente > 0 /* && $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/)  {
+            if ( ($diferenciaDias == -7 /* $diferenciaDias <= -1 && $diferenciaDias >= -2 */) && $adeudoCliente > 0 /* && $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/)  {
 
                 for ($j = 2; $j < $totalRegistros; $j++) {
 
