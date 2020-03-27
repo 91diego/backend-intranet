@@ -211,5 +211,6 @@ class ChatBotController extends Controller
 
         $result = curl_exec($curl);
         curl_close($curl);
+        return json_decode($result);
     }
 }

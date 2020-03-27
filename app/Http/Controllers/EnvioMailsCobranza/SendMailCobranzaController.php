@@ -139,7 +139,7 @@ class SendMailCobranzaController extends Controller
             // Mail::to($data[$i]["email"])
             Mail::to('dgonzalez@idex.cc')
             // ->cc('dgonzalez@idex.cc')
-            // ->bcc('jbasurto@idex.cc')
+            ->bcc('diego.gonzalez.glez91@gmail.com', 'diegoaglez91@gmail.com')
             ->send(new Notificaciones($data[$i], $informacionPagos, $ultimoPago, $acumuladoSaldoVencido, $totalPagado, $pathPDF));
         }
     }
@@ -149,20 +149,25 @@ class SendMailCobranzaController extends Controller
         // GUARDA INFORMACION PARA ENVIAR POR EMAIL
         // NOTIFICACION 7 DIAS ANTES DEL PAGO
         $informacionAlertaPago = [];
-        // NOTIFICACION 90 DIAS ATRASO
+        // NOTIFICACION 7 DIAS ATRASO
         $informacionAdvertenciaPago1 = [];
-        // NOTIFICACION 120 DIAS ATRASO
+        // NOTIFICACION 30 DIAS ATRASO
         $informacionAdvertenciaPago2 = [];
+        // NOTIFICACION DE PAGO 120 DIAS DE ATRASO
+        $informacionAdvertenciaPago3 = [];
+
         // OBTENER INFORMACION DE PAGOS DEL CLIENTE NOTIFICACION DE PAGO
         $estadoCuentaN1 = [];
         // OBTENER INFORMACION DE PAGOS DEL CLIENTE ALERTA DE PAGO 1
         $estadoCuentaA1 = [];
         // OBTENER INFORMACION DE PAGOS DEL CLIENTE ALERTA DE PAGO 2
         $estadoCuentaA2 = [];
+        // OBTENER INFORMACION DE PAGOS DEL CLIENTE ALERTA DE PAGO 3
+        $estadoCuentaA3 = [];
+
         // ALMACENA LOS REGISTROS QUE TENGAN PLAN DEL CREDITO- 1
         $informacionClientesPlanCredito = [];
 
-        // $fileName=env('DATOS_COBRANZA', base_path().'/storage/cobranza/DatosCobranza.txt');
         $fileName=env('DATOS_COBRANZA', storage_path().'/cobranza/DatosCobranza.txt');
         // print_r(storage_path()); exit;
         
@@ -222,9 +227,8 @@ class SendMailCobranzaController extends Controller
             $conceptoPagoCliente = $registros[$i]['Concepto'];
             /* SI EL CONCEPTO ES PLAN DEL CREDITO- 1 Y LA FECHA DEL REGISTRO ES IGUAL A LA FECHA ACTUAL,
             SE INSERTA EN EL ARRAY informacionClientesPlanCredito */
-            if ($conceptoPagoCliente == 'PLAN DEL CREDITO- 1' /* && (strtotime($registros[$i]['FechaPlan']) == $fecha_actual)*/ ) {
+            if ($conceptoPagoCliente == 'PLAN DEL CREDITO- 1' && (strtotime($registros[$i]['FechaPlan']) == $fecha_actual) ) {
 
-                // echo $registros[$i]['Cliente'].'<br>';
                 array_push($informacionClientesPlanCredito, [
 
                     "id_cliente" => $registros[$i]['IdCliente'],
@@ -249,7 +253,8 @@ class SendMailCobranzaController extends Controller
             $diferenciaDias = (int)$registros[$i]['DifDias'];
             $adeudoCliente = (float)$registros[$i]['SaldoPendiente'];
 
-            if ( ($diferenciaDias == -1/* $diferenciaDias <= -1 && $diferenciaDias >= -2 */) && $adeudoCliente > 0 /* && $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/)  {
+            // ENVIO 7 DIAS ANTES DE SU PAGO
+            if ( (/* $diferenciaDias == -7*/ $diferenciaDias <= -1 && $diferenciaDias >= -2) && $adeudoCliente > 0 /* && $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/)  {
 
                 for ($j = 2; $j < $totalRegistros; $j++) {
 
@@ -295,6 +300,7 @@ class SendMailCobranzaController extends Controller
                     "dias_antes_pago" => $registros[$i]['DifDias']
                 ]);
 
+                // RECORDATORIO DE PAGO 7 DIAS DESPUES DE SU PAGO SOLO SI TIENE ADEUDO
             } elseif ( $diferenciaDias == 7 && $adeudoCliente > 1 /*&& $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/) {
 
                 for ($j = 2; $j < $totalRegistros; $j++) {
@@ -340,7 +346,8 @@ class SendMailCobranzaController extends Controller
                     "dias_antes_pago" => $registros[$i]['DifDias']
                 ]);
 
-            } elseif ( ($diferenciaDias == 120) && $adeudoCliente > 1 /*&& $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/) {
+                // NOTIFICACION DE PAGO 90 DIAS DESPUES SI AUN TIENE ADEUDO
+            } elseif ( ($diferenciaDias == 90) && $adeudoCliente > 1 /*&& $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/) {
 
                 for ($j = 2; $j < $totalRegistros; $j++) {
 
@@ -383,6 +390,51 @@ class SendMailCobranzaController extends Controller
                     "precio" => $registros[$i]['PrecioReal'],
                     "dias_antes_pago" => $registros[$i]['DifDias']
                 ]);
+
+                // NOTIFICACION DE PAGO 120 DIAS DESPUES SI AUN TIENE ADEUDO
+            } elseif ( ($diferenciaDias == 120) && $adeudoCliente > 1 /*&& $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/) {
+
+                for ($j = 2; $j < $totalRegistros; $j++) {
+
+                    if ($registros[$i]['IdCliente'] === $registros[$j]['IdCliente']) {
+
+                        array_push($estadoCuentaA3, [
+
+                            "id_cliente" => $registros[$j]['IdCliente'],
+                            "cliente" => $registros[$j]['Cliente'],
+                            "vivienda" => $registros[$j]['Vivienda'],
+                            "prototipo" => $registros[$j]['Prototipo'],
+                            "metros_cuadrados" => $registros[$j]['M2'],
+                            "torre" => $registros[$j]['Torre'],
+                            "desarrollo" => $registros[$j]['Desarrollo'],
+                            "email" => $registros[$j]['Email'],
+                            "concepto" => $registros[$j]['Concepto'],
+                            "fecha_pago" => $registros[$j]['FechaPlan'],
+                            "monto_pago" => $registros[$j]['SaldoPendiente'],
+                            "precio" => $registros[$j]['PrecioReal'],
+                            "mes_contrato" => $registros[$i]['MesContrato'],
+                            "dias_antes_pago" => $registros[$j]['DifDias']
+                        ]);
+                    }   
+                }
+
+                // INFORMACION DE CLIENTES ALERTA DE PAGO 2
+                array_push($informacionAdvertenciaPago3, [
+
+                    "id_cliente" => $registros[$i]['IdCliente'],
+                    "cliente" => $registros[$i]['Cliente'],
+                    "vivienda" => $registros[$i]['Vivienda'],
+                    "prototipo" => $registros[$i]['Prototipo'],
+                    "metros_cuadrados" => $registros[$i]['M2'],
+                    "torre" => $registros[$i]['Torre'],
+                    "desarrollo" => $registros[$i]['Desarrollo'],
+                    "email" => $registros[$i]['Email'],
+                    "concepto" => $registros[$i]['Concepto'],
+                    "fecha_pago" => $registros[$i]['FechaPlan'],
+                    "monto_pago" => $registros[$i]['SaldoPendiente'],
+                    "precio" => $registros[$i]['PrecioReal'],
+                    "dias_antes_pago" => $registros[$i]['DifDias']
+                ]);
             }
         }
 
@@ -390,6 +442,7 @@ class SendMailCobranzaController extends Controller
         $totalInformacionAlertaPago = count($informacionAlertaPago);
         $totalAdvertenciaPago1 = count($informacionAdvertenciaPago1);
         $totalAdvertenciaPago2 = count($informacionAdvertenciaPago2);
+        $totalAdvertenciaPago3 = count($informacionAdvertenciaPago3);
 
         // ENVIO DE EMAILS
         $pathReportePDF = '';
@@ -399,7 +452,8 @@ class SendMailCobranzaController extends Controller
         $this->emailSending($informacionAlertaPago, $estadoCuentaN1, $totalInformacionAlertaPago, $this->path);
         $this->emailSending($informacionAdvertenciaPago1, $estadoCuentaA1, $totalAdvertenciaPago1, $this->path);
         $this->emailSending($informacionAdvertenciaPago2, $estadoCuentaA2, $totalAdvertenciaPago2, $this->path);
-        
+        $this->emailSending($informacionAdvertenciaPago3, $estadoCuentaA3, $totalAdvertenciaPago3, $this->path);
+
         /* ENVIO DEL REPORTE CON LOS CLIENTES PROXIMOS A ENTREGAR.
         SI EL ARRAY NO CONTIENE INFORMACION, NO SE REALIZA NINGUNA ENVIO. */
         $this->sendReport($informacionClientesPlanCredito, $pathReportePDF);
