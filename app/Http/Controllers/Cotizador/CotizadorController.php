@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Cotizador;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Torre;
+
 
 class CotizadorController extends Controller
 {
@@ -25,7 +28,8 @@ class CotizadorController extends Controller
      */
     public function index()
     {
-        //
+        $torres = Torre::get();
+        echo json_encode($torres);
     }
 
     /**
