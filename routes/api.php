@@ -105,4 +105,5 @@ Route::resource('torres', 'Cotizador\CotizadorController');
 Route::get('torre/{desarrollo}/{torre}', 'Cotizador\CotizadorController@torre');
 Route::get('piso-general/{desarrollo}/{torre}', 'Cotizador\CotizadorController@pisoGeneral');
 Route::get('piso-detallado/{desarrollo}/{torre}/{piso}', 'Cotizador\CotizadorController@pisoDetallado');
+Route::get('departamento-detallado/{desarrollo}/{torre}/{piso}/{departamento}', 'Cotizador\CotizadorController@departamentoDetallado');
 /* FIN INFORMACION DISPONIBILIDAD COTIZADOR */

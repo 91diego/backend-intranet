@@ -13,6 +13,34 @@ use App\ProductsCf;
 
 class CotizadorController extends Controller
 {
+    
+    /**
+     * Muestra detalles de la disponibilidad por piso
+     * @param string $desarrollo
+     * @param string $torre
+     * @param string $piso
+     * @param string $departamento
+     */
+    public function departamentoDetallado($desarrollo, $torre, $piso, $departamento) {
+
+        $deptoDetallado = new DisponibilidadCotizador();
+        $deptoDetallado = DB::table('vtiger_products')
+        ->join('vtiger_crmentity', 'vtiger_products.productid', '=', 'vtiger_crmentity.crmid')
+        ->join('vtiger_productcf', 'vtiger_productcf.productid', '=', 'vtiger_products.productid')
+        ->select('vtiger_productcf.cf_1165 AS tipo',
+        'vtiger_products.productname AS codigo', 'vtiger_products.unit_price AS precio',
+        'vtiger_productcf.cf_1183 AS bodega', 'vtiger_productcf.cf_1181 AS estasig')
+        ->selectRaw('vtiger_products.qtyinstock * vtiger_products.discontinued AS disp')
+        ->where('vtiger_crmentity.deleted', '=', 0)
+        ->where('vtiger_productcf.cf_1179', '=', 'Vivienda')
+        ->where('vtiger_productcf.cf_1163', '=', $desarrollo)
+        ->where('vtiger_productcf.cf_1167', '=', $torre)
+        ->where('vtiger_productcf.cf_1169', '=', $piso)
+        ->where('vtiger_productcf.cf_1171', '=', $departamento)
+        ->orderBy('vtiger_productcf.cf_1171', 'DESC', 'tipo', 'ASC')
+        ->get();
+        echo json_encode($deptoDetallado);
+    }
 
     /**
      * Muestra detalles de la disponibilidad por piso
