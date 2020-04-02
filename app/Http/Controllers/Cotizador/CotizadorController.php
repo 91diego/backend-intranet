@@ -15,13 +15,27 @@ class CotizadorController extends Controller
 {
 
     /**
-     * Muestra disponibilidad que se tiene de departamentos por piso
+     * Muestra disponibilidad que se tiene de departamentos por piso de manera general
      * @param string $desarrollo
      * @param string $numeroTorre
-     * @param string $numeroPiso
      */
-    public function piso($desarrollo, $numeroTorre, $numeroPiso) {
-
+    public function pisoGeneral($desarrollo, $numeroTorre) {
+        $pisoGeneral = new DisponibilidadCotizador();
+        $pisoGeneral = DB::table('vtiger_products')
+        ->join('vtiger_crmentity', 'vtiger_products.productid', '=', 'vtiger_crmentity.crmid')
+        ->join('vtiger_productcf', 'vtiger_productcf.productid', '=', 'vtiger_products.productid')
+        //->where('vtiger_productcf.cf_1179', '=', 'Vivienda')
+        ->select('vtiger_productcf.cf_1169 AS nivel', 'vtiger_productcf.cf_1165 AS tipo')
+        ->selectRaw('COUNT(vtiger_products.productid) AS cant')
+        ->selectRaw('SUM(vtiger_products.qtyinstock * vtiger_products.discontinued) AS disp')
+        ->where('vtiger_productcf.cf_1179', '=', 'Vivienda')
+        ->where('vtiger_productcf.cf_1163', '=', $desarrollo)
+        ->where('vtiger_productcf.cf_1167', '=', $numeroTorre)
+        ->where('vtiger_crmentity.deleted', '=', 0)
+        ->groupBy('nivel', 'tipo')
+        ->orderBy('nivel', 'DESC', 'tipo', 'ASC')
+        ->get();
+        echo json_encode($pisoGeneral);
     }
 
     /**
@@ -45,7 +59,7 @@ class CotizadorController extends Controller
             ->where('vtiger_productcf.cf_1167', '=', $numeroTorre)
             ->where('vtiger_crmentity.deleted', '=', 0)
             ->groupBy('torre', 'piso', 'tipo')
-            //->orderBy('torre', 'piso', 'tipo')
+            ->orderBy('torre', 'DESC', 'piso', 'DESC', 'tipo', 'DESC')
             ->get();
             echo json_encode($disponibilidad);
     }
