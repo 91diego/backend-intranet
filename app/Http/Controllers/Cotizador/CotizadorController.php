@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Cotizador;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Torre;
+use App\DisponibilidadCotizador;
+use App\CrmEntity;
+use App\Products;
+use App\ProductsCf;
 
 
 class CotizadorController extends Controller
@@ -17,8 +20,24 @@ class CotizadorController extends Controller
      * @param string $numeroTorre
      */
     public function torre($desarrollo, $numeroTorre) {
-
-        return "Desarrollo:".$desarrollo.". Torre: ".$numeroTorre;
+        
+        $torres = new DisponibilidadCotizador();
+        $torres = DB::table('vtiger_products')
+            ->join('vtiger_crmentity', 'vtiger_products.productid', '=', 'vtiger_crmentity.crmid')
+            ->join('vtiger_productcf', 'vtiger_productcf.productid', '=', 'vtiger_products.productid')
+            //->where('vtiger_productcf.cf_1179', '=', 'Vivienda')
+            ->select('vtiger_productcf.cf_1167 AS torre', 'vtiger_productcf.cf_1165 AS tipo',
+            'vtiger_productcf.cf_1169 AS piso')
+            ->selectRaw('count(vtiger_products.productid) AS cant')
+            ->selectRaw('sum(vtiger_products.qtyinstock * vtiger_products.discontinued) AS disp')
+            ->where('vtiger_productcf.cf_1179', '=', 'Vivienda')
+            ->where('vtiger_productcf.cf_1163', '=', $desarrollo)
+            ->where('vtiger_productcf.cf_1167', '=', $numeroTorre)
+            ->where('vtiger_crmentity.deleted', '=', 0)
+            ->groupBy('torre', 'piso', 'tipo')
+            //->orderBy('torre', 'piso', 'tipo')
+            ->get();
+            echo json_encode($torres);
     }
 
     /**
@@ -28,7 +47,7 @@ class CotizadorController extends Controller
      */
     public function index()
     {
-        $torres = Torre::get();
+        $torres = Products::get();
         echo json_encode($torres);
     }
 
