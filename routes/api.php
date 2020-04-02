@@ -102,6 +102,7 @@ Route::resource('bot/newLead', 'ChatBot\ChatBotController');
 
 // RUTA PARA OBTENER LA DISPONIBILIDAD DE LA TORRES
 Route::resource('torres', 'Cotizador\CotizadorController');
-Route::get('torre/{desarrollo}/{numeroTorre}', 'Cotizador\CotizadorController@torre');
-Route::get('piso-general/{desarrollo}/{numeroTorre}', 'Cotizador\CotizadorController@pisoGeneral');
+Route::get('torre/{desarrollo}/{torre}', 'Cotizador\CotizadorController@torre');
+Route::get('piso-general/{desarrollo}/{torre}', 'Cotizador\CotizadorController@pisoGeneral');
+Route::get('piso-detallado/{desarrollo}/{torre}/{piso}', 'Cotizador\CotizadorController@pisoDetallado');
 /* FIN INFORMACION DISPONIBILIDAD COTIZADOR */
