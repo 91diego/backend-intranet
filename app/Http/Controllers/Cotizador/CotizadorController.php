@@ -15,14 +15,24 @@ class CotizadorController extends Controller
 {
 
     /**
-     * Muestra disponibilidad que se tiene en la torre
+     * Muestra disponibilidad que se tiene de departamentos por piso
+     * @param string $desarrollo
+     * @param string $numeroTorre
+     * @param string $numeroPiso
+     */
+    public function piso($desarrollo, $numeroTorre, $numeroPiso) {
+
+    }
+
+    /**
+     * Muestra disponibilidad que se tiene en cada piso de la torre
      * @param string $desarrollo
      * @param string $numeroTorre
      */
     public function torre($desarrollo, $numeroTorre) {
         
-        $torres = new DisponibilidadCotizador();
-        $torres = DB::table('vtiger_products')
+        $disponibilidad = new DisponibilidadCotizador();
+        $disponibilidad = DB::table('vtiger_products')
             ->join('vtiger_crmentity', 'vtiger_products.productid', '=', 'vtiger_crmentity.crmid')
             ->join('vtiger_productcf', 'vtiger_productcf.productid', '=', 'vtiger_products.productid')
             //->where('vtiger_productcf.cf_1179', '=', 'Vivienda')
@@ -37,7 +47,7 @@ class CotizadorController extends Controller
             ->groupBy('torre', 'piso', 'tipo')
             //->orderBy('torre', 'piso', 'tipo')
             ->get();
-            echo json_encode($torres);
+            echo json_encode($disponibilidad);
     }
 
     /**
