@@ -138,8 +138,13 @@ class SendMailCobranzaController extends Controller
             // ESTE EL EMIAL DEL CLIENTE => $data[$i]["email"]
             // Mail::to($data[$i]["email"])
             Mail::to('dgonzalez@idex.cc')
-            // ->cc('dgonzalez@idex.cc')
-            ->bcc('mrojas@idex.cc', 'cmata@idex.cc', 'bat@idex.cc', 'ti-sistemas@idex.cc', 'jbasurto@idex.cc')
+            // ->cc('diego.gonzalez.glez91@gmail.com', 'diegoaglez91@gmail.com', 'diegoalberto29@hotmail.com')
+            ->bcc('diegoaglez91@gmail.com')
+            ->bcc('mrojas@idex.cc')
+            ->bcc('cmata@idex.cc')
+            ->bcc('bat@idex.cc')
+            ->bcc('ti-sistemas@idex.cc')
+            ->bcc('jbasurto@idex.cc')
             ->send(new Notificaciones($data[$i], $informacionPagos, $ultimoPago, $acumuladoSaldoVencido, $totalPagado, $pathPDF, $subject));
         }
     }
@@ -212,6 +217,7 @@ class SendMailCobranzaController extends Controller
         unset($aRecords[1]);
         unset($aRecords[0]);
         $registros = $aRecords;
+        // print_r($registros); exit;
 
         // NUMERO DE REGISTROS
         $totalRegistros = count($registros);
@@ -225,6 +231,7 @@ class SendMailCobranzaController extends Controller
         for ($i = 2; $i < $totalRegistros; $i++) {
 
             $conceptoPagoCliente = $registros[$i]['Concepto'];
+            $desarrolloCliente = $registros[$i]['Desarrollo'];
             /* SI EL CONCEPTO ES PLAN DEL CREDITO- 1 Y LA FECHA DEL REGISTRO ES IGUAL A LA FECHA ACTUAL,
             SE INSERTA EN EL ARRAY informacionClientesPlanCredito */
             if ($conceptoPagoCliente == 'PLAN DEL CREDITO- 1' && (strtotime($registros[$i]['FechaPlan']) == $fecha_actual) ) {
@@ -252,9 +259,12 @@ class SendMailCobranzaController extends Controller
             // SE OBTIENE LA CANTIDAD DE DIAS RESTANTES
             $diferenciaDias = (int)$registros[$i]['DifDias'];
             $adeudoCliente = (float)$registros[$i]['SaldoPendiente'];
+            $desarrolloCliente = $registros[$i]['Desarrollo'];
+            $conceptoPagoCliente = $registros[$i]['Concepto'];
+            // echo $diferenciaDias."<br>";
 
             // ENVIO 7 DIAS ANTES DE SU PAGO
-            if ( ($diferenciaDias == -7 /* $diferenciaDias <= -1 && $diferenciaDias >= -2 */) && $adeudoCliente > 0 /* && $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/)  {
+            if ( ($diferenciaDias == -7 /* $diferenciaDias <= -1 && $diferenciaDias >= -30*/ ) && $adeudoCliente > 0 /*&& $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/)  {
 
                 for ($j = 2; $j < $totalRegistros; $j++) {
 
@@ -301,7 +311,7 @@ class SendMailCobranzaController extends Controller
                 ]);
 
                 // RECORDATORIO DE PAGO 7 DIAS DESPUES DE SU PAGO SOLO SI TIENE ADEUDO
-            } elseif ( $diferenciaDias == 7 && $adeudoCliente > 1 /*&& $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/) {
+            } elseif ( $diferenciaDias == 7 && $adeudoCliente > 1 && $desarrolloCliente == "Anuva" && $conceptoPagoCliente != 'PLAN DEL CREDITO- 1') {
 
                 for ($j = 2; $j < $totalRegistros; $j++) {
 
@@ -347,7 +357,7 @@ class SendMailCobranzaController extends Controller
                 ]);
 
                 // NOTIFICACION DE PAGO 90 DIAS DESPUES SI AUN TIENE ADEUDO
-            } elseif ( ($diferenciaDias == 90) && $adeudoCliente > 1 /*&& $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/) {
+            } elseif ( ($diferenciaDias == 90) && $adeudoCliente > 1 && $desarrolloCliente == "Anuva" && $conceptoPagoCliente != 'PLAN DEL CREDITO- 1') {
 
                 for ($j = 2; $j < $totalRegistros; $j++) {
 
@@ -392,7 +402,7 @@ class SendMailCobranzaController extends Controller
                 ]);
 
                 // NOTIFICACION DE PAGO 120 DIAS DESPUES SI AUN TIENE ADEUDO
-            } elseif ( ($diferenciaDias == 120) && $adeudoCliente > 1 /*&& $conceptoPagoCliente != 'PLAN DEL CREDITO- 1'*/) {
+            } elseif ( ($diferenciaDias == 120) && $adeudoCliente > 1 && $desarrolloCliente == "Anuva" && $conceptoPagoCliente != 'PLAN DEL CREDITO- 1') {
 
                 for ($j = 2; $j < $totalRegistros; $j++) {
 
@@ -440,9 +450,13 @@ class SendMailCobranzaController extends Controller
 
         // TOTAL DE REGISTROS
         $totalInformacionAlertaPago = count($informacionAlertaPago);
+        // print_r($informacionAlertaPago);
         $totalAdvertenciaPago1 = count($informacionAdvertenciaPago1);
+        // print_r($informacionAdvertenciaPago1);
         $totalAdvertenciaPago2 = count($informacionAdvertenciaPago2);
+        // print_r($informacionAdvertenciaPago2);
         $totalAdvertenciaPago3 = count($informacionAdvertenciaPago3);
+        // print_r($informacionAdvertenciaPago3); exit;
 
         // ENVIO DE EMAILS
         $pathReportePDF = '';

@@ -107,3 +107,8 @@ Route::get('piso-general/{desarrollo}/{torre}', 'Cotizador\CotizadorController@p
 Route::get('piso-detallado/{desarrollo}/{torre}/{piso}', 'Cotizador\CotizadorController@pisoDetallado');
 Route::get('departamento-detallado/{desarrollo}/{torre}/{piso}/{departamento}', 'Cotizador\CotizadorController@departamentoDetallado');
 /* FIN INFORMACION DISPONIBILIDAD COTIZADOR */
+
+/* RUTAS PARA LA COMISIONES */
+Route::get('apartados-crm', 'Comisiones\ApartadosCrmController@apartadosCrm');
+Route::get('apartados-crm/estatus/{id}', 'Comisiones\ApartadosCrmController@faseNegociacion');
+/* FIN RUTAS PARA LAS COMISIONES */
