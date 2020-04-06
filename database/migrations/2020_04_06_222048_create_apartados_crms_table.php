@@ -15,6 +15,15 @@ class CreateApartadosCrmsTable extends Migration
     {
         Schema::create('apartados_crms', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('id_negociacion');
+            $table->integer('id_lead');
+            $table->string('nombre_negociacion');
+            $table->string('producto1');
+            $table->string('producto2');
+            $table->string('total');
+            $table->string('precio_producto');
+            $table->integer('estatus_apartado');
+            $table->foreign('id_responsable')->references('id_usuario_crm')->on('usuarios');
             $table->timestamps();
         });
     }
