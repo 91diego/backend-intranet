@@ -136,15 +136,12 @@ class SendMailCobranzaController extends Controller
             }
             
             // ESTE EL EMIAL DEL CLIENTE => $data[$i]["email"]
+            $bcc = explode(',', env('ADMIN_EMAILS'));
             // Mail::to($data[$i]["email"])
             Mail::to('dgonzalez@idex.cc')
             // ->cc('diego.gonzalez.glez91@gmail.com', 'diegoaglez91@gmail.com', 'diegoalberto29@hotmail.com')
-            ->bcc('diegoaglez91@gmail.com')
-            ->bcc('mrojas@idex.cc')
-            ->bcc('cmata@idex.cc')
-            ->bcc('bat@idex.cc')
-            ->bcc('ti-sistemas@idex.cc')
-            ->bcc('jbasurto@idex.cc')
+            // ->bcc('diegoaglez91@gmail.com')
+            ->bcc($bcc)
             ->send(new Notificaciones($data[$i], $informacionPagos, $ultimoPago, $acumuladoSaldoVencido, $totalPagado, $pathPDF, $subject));
         }
     }
