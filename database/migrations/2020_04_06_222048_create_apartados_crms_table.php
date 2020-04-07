@@ -23,6 +23,7 @@ class CreateApartadosCrmsTable extends Migration
             $table->string('total');
             $table->string('precio_producto');
             $table->integer('estatus_apartado');
+            $table->string('desarrollo');
             $table->foreign('id_responsable')->references('id_usuario_crm')->on('usuarios');
             $table->timestamps();
         });

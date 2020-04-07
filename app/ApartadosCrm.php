@@ -15,6 +15,7 @@ class ApartadosCrm extends Model
         'total',
         'precio_producto',
         'estatus_apartado',
-        'id_responsable'
+        'id_responsable',
+        'desarrollo'
     ];
 }

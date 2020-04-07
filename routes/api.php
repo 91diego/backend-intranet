@@ -111,4 +111,5 @@ Route::get('departamento-detallado/{desarrollo}/{torre}/{piso}/{departamento}', 
 /* RUTAS PARA LA COMISIONES */
 Route::get('apartados-crm', 'Comisiones\ApartadosCrmController@apartadosCrm');
 Route::get('apartados-crm/estatus/{id}', 'Comisiones\ApartadosCrmController@faseNegociacion');
+Route::get('apartados-crm/lista-desarrollo/{desarrollo}', 'Comisiones\ApartadosCrmController@listaNegociaciones');
 /* FIN RUTAS PARA LAS COMISIONES */

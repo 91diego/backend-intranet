@@ -18,6 +18,57 @@ class ApartadosCrmController extends Controller
     }
 
     /**
+     * Obtiene el nombre del desarrollo del CRM
+     * @param  int  $id
+     * @return string $nombreDeesarrollo
+     */
+    public function obtenerNombreDesarrollo($id){
+
+        $fieldsDeals = $this->bitrixSite.'/rest/117/'.$this->bitrixToken.'/crm.deal.fields';
+
+        // OBTIENE LA RESPUESTA DE LA API REST BITRIX
+        $responseAPI = file_get_contents($fieldsDeals);
+
+        // CAMPOS DE LA RESPUESTA
+        $fields = json_decode($responseAPI, true);
+
+        // NUMERO DE CAMPOS EN LA POSICION DEL ARRAY
+        $numberItems = count($fields['result']['UF_CRM_5D12A1A9D28ED']['items']);
+        // ARRAY DE ITEMS
+        $items = [];
+        for ($i=0; $i < $numberItems; $i++) {
+
+            array_push($items, [
+
+                "id" => $fields['result']['UF_CRM_5D12A1A9D28ED']['items'][$i]["ID"],
+                "nombre" => $fields['result']['UF_CRM_5D12A1A9D28ED']['items'][$i]["VALUE"]
+            ]);
+        }
+
+        for ($i=0; $i < count($items); $i++) { 
+            
+            if ($items[$i]["id"] == $id) {
+
+                $nombreDesarrollo = $items[$i]["nombre"];
+                return $nombreDesarrollo;
+            }
+        }
+        return $nombreDesarrollo;
+    }
+
+    /**
+     * Obtiene la lista de las negociaciones por desarrollo
+     * La negociaciones deben tener un estatus 1
+     * Este estatus indica que la negociaciones esta en la fase de apartado
+     * @param  string  $desarrollo
+     */
+    public function listaNegociaciones($desarrollo) {
+
+        $query = ApartadosCrm::WHERE('desarrollo', '=', $desarrollo)->select('*')->get();
+        return $query;
+    }
+
+    /**
      * Obtiene la fase de la negociacion
      * @param  int  $id_deal
      */
@@ -25,9 +76,11 @@ class ApartadosCrmController extends Controller
 
         // URL PARA OBTENER INFORMACION DEL DEAL
         $urlDeals = $this->bitrixSite.'/rest/117/'.$this->bitrixToken.'/crm.deal.get?ID='.$id_deal;
+        
         // OBTIENE LA RESPUESTA DE LA API REST BITRIX
         $responseAPI = file_get_contents($urlDeals);
         $data = json_decode($responseAPI, true);
+        $desarrollo = $this->obtenerNombreDesarrollo($data['result']['UF_CRM_5D12A1A9D28ED']);
 
         /**
          * [STAGE_ID]= 1 -> VISITA
@@ -54,7 +107,8 @@ class ApartadosCrmController extends Controller
                 'total' => $data['result']['UF_CRM_1573066384206'],
                 'precio_producto' => $data['result']['OPPORTUNITY'],
                 'estatus_apartado' => 0,
-                'id_responsable' => $data['result']['ASSIGNED_BY_ID']
+                'id_responsable' => $data['result']['ASSIGNED_BY_ID'],
+                "desarrollo" => $desarrollo
             ));
             
             // SI LA NEGOCIACION CAE EN LA FASE DE APARTADO
@@ -76,7 +130,8 @@ class ApartadosCrmController extends Controller
                     'total' => $data['result']['UF_CRM_1573066384206'],
                     'precio_producto' => $data['result']['OPPORTUNITY'],
                     'estatus_apartado' => 0,
-                    'id_responsable' => $data['result']['ASSIGNED_BY_ID']
+                    'id_responsable' => $data['result']['ASSIGNED_BY_ID'],
+                    "desarrollo" => $desarrollo
                 ]
             );
 
@@ -90,7 +145,8 @@ class ApartadosCrmController extends Controller
                 'total' => $data['result']['UF_CRM_1573066384206'],
                 'precio_producto' => $data['result']['OPPORTUNITY'],
                 'estatus_apartado' => 1,
-                'id_responsable' => $data['result']['ASSIGNED_BY_ID']
+                'id_responsable' => $data['result']['ASSIGNED_BY_ID'],
+                "desarrollo" => $desarrollo
             ));
         }
 
@@ -123,6 +179,7 @@ class ApartadosCrmController extends Controller
                 // OBTIENE LA RESPUESTA DE LA API REST BITRIX
                 $response = file_get_contents($detailsDeal);
                 $data = json_decode($response, true);
+                $desarrollo = $this->obtenerNombreDesarrollo($data['result']['UF_CRM_5D12A1A9D28ED']);
                 array_push($arrayApartados, [
                     "id_negociacion" => $data['result']['ID'],
                     "id_lead" => $data['result']['LEAD_ID'],
@@ -132,12 +189,13 @@ class ApartadosCrmController extends Controller
                     "producto2" => $data['result']['UF_CRM_1573064054413'],
                     "total" => $data['result']['UF_CRM_1573066384206'],
                     "precio_producto" => $data['result']['OPPORTUNITY'],
-                    "estatus_apartado" => 1
+                    "estatus_apartado" => 1,
+                    "desarrollo" => $desarrollo
                 ]);
             }
         }
 
-                /* 
+        /* 
             SE RECORRE EL ARRAY QUE CONTIENE LA RESPUESTA DE LA API
             SE INSERTAN REGISTROS SI NO EXISTEN
             SE ACTUALIZA LA INFORMACION
@@ -158,7 +216,8 @@ class ApartadosCrmController extends Controller
                     'total' => $arrayApartados[$j]['total'],
                     'precio_producto' => $arrayApartados[$j]['precio_producto'],
                     'estatus_apartado' => $arrayApartados[$j]['estatus_apartado'],
-                    'id_responsable' => $arrayApartados[$j]['id_responsable']
+                    'id_responsable' => $arrayApartados[$j]['id_responsable'],
+                    'desarrollo' => $arrayApartados[$j]['desarrollo']
                 ]
             );
 
@@ -172,7 +231,8 @@ class ApartadosCrmController extends Controller
                 'total' => $arrayApartados[$j]['total'],
                 'precio_producto' => $arrayApartados[$j]['precio_producto'],
                 'estatus_apartado' => $arrayApartados[$j]['estatus_apartado'],
-                'id_responsable' => $arrayApartados[$j]['id_responsable']
+                'id_responsable' => $arrayApartados[$j]['id_responsable'],
+                'desarrollo' => $arrayApartados[$j]['desarrollo']
             ));
         }
         return $data;
