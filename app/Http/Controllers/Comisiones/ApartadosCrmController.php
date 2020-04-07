@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Comisiones;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\ApartadosCrm;
 
 class ApartadosCrmController extends Controller
 {
@@ -32,21 +33,66 @@ class ApartadosCrmController extends Controller
          * [STAGE_ID]= 1 -> VISITA
          * [STAGE_ID]= 5 -> CITA PROGRAMADA
          * [STAGE_ID]= NEW -> PRECALIFICADO
-         * [STAGE_ID]= 2 -> APARTADO
+         * [STAGE_ID]= 2 -> PROCESO DE APARTADO
+         * [STAGE_ID]= 6 -> APARTADO
          */
         if ($data['result']['STAGE_ID'] == "NEW" || $data['result']['STAGE_ID'] == 1
-        || $data['result']['STAGE_ID'] == 5) {
+        || $data['result']['STAGE_ID'] == 5 || $data['result']['STAGE_ID'] == 2) {
+
+            echo "Cambia la fase";
             
-            return "ESTATUS";
             /* SE REALIZA EL UPDATE A LA TABLA DE APARTADOS 
             Y CAMBIAMOS EL VALOR DEL ESTATUS A 0 */
-        } elseif ($data['result']['STAGE_ID'] == 2) {
+
+            // ACTUALIZA LOS REGISTROS DE LA TABLA
+            ApartadosCrm::WHERE('id_negociacion', '=', $id_deal)->UPDATE(array(
+
+                'id_lead' => $data['result']['LEAD_ID'],
+                'nombre_negociacion' => $data['result']['TITLE'],
+                'producto1' => $data['result']['UF_CRM_1573063908'],
+                'producto2' => $data['result']['UF_CRM_1573064054413'],
+                'total' => $data['result']['UF_CRM_1573066384206'],
+                'precio_producto' => $data['result']['OPPORTUNITY'],
+                'estatus_apartado' => 0,
+                'id_responsable' => $data['result']['ASSIGNED_BY_ID']
+            ));
+            
+            // SI LA NEGOCIACION CAE EN LA FASE DE APARTADO
+        } elseif ($data['result']['STAGE_ID'] == 6) {
             
             /* SI EL REGISTRO NO EXISTE, SE INSERTA
             DE LO CONTRARIO SE ACTUALIZA LA INFORMACION */
-            return $data['result']['STAGE_ID'];
+            // INSERTA REGISTROS SI NO EXISTEN
+            $info = ApartadosCrm::firstOrCreate(
+                [
+                    'id_negociacion' => $id_deal
+                ],
+                [
+                    'id_negociacion' => $id_deal,
+                    'id_lead' => $data['result']['LEAD_ID'],
+                    'nombre_negociacion' => $data['result']['TITLE'],
+                    'producto1' => $data['result']['UF_CRM_1573063908'],
+                    'producto2' => $data['result']['UF_CRM_1573064054413'],
+                    'total' => $data['result']['UF_CRM_1573066384206'],
+                    'precio_producto' => $data['result']['OPPORTUNITY'],
+                    'estatus_apartado' => 0,
+                    'id_responsable' => $data['result']['ASSIGNED_BY_ID']
+                ]
+            );
+
+            // ACTUALIZA LOS REGISTROS DE LA TABLA
+            ApartadosCrm::WHERE('id_negociacion', '=', $id_deal)->UPDATE(array(
+
+                'id_lead' => $data['result']['LEAD_ID'],
+                'nombre_negociacion' => $data['result']['TITLE'],
+                'producto1' => $data['result']['UF_CRM_1573063908'],
+                'producto2' => $data['result']['UF_CRM_1573064054413'],
+                'total' => $data['result']['UF_CRM_1573066384206'],
+                'precio_producto' => $data['result']['OPPORTUNITY'],
+                'estatus_apartado' => 1,
+                'id_responsable' => $data['result']['ASSIGNED_BY_ID']
+            ));
         }
-        // return $data['result']['STAGE_ID'];
 
     }
     /**
@@ -81,7 +127,7 @@ class ApartadosCrmController extends Controller
                     "id_negociacion" => $data['result']['ID'],
                     "id_lead" => $data['result']['LEAD_ID'],
                     "nombre_negociacion" => $data['result']['TITLE'],
-                    "responsable" => $data['result']['ASSIGNED_BY_ID'],
+                    "id_responsable" => $data['result']['ASSIGNED_BY_ID'],
                     "producto1" => $data['result']['UF_CRM_1573063908'],
                     "producto2" => $data['result']['UF_CRM_1573064054413'],
                     "total" => $data['result']['UF_CRM_1573066384206'],
@@ -90,7 +136,46 @@ class ApartadosCrmController extends Controller
                 ]);
             }
         }
-        return $arrayApartados;
+
+                /* 
+            SE RECORRE EL ARRAY QUE CONTIENE LA RESPUESTA DE LA API
+            SE INSERTAN REGISTROS SI NO EXISTEN
+            SE ACTUALIZA LA INFORMACION
+        */
+        for ($j = 0; $j < count($arrayApartados); $j++) {
+
+            // INSERTA REGISTROS SI NO EXISTEN
+            $data = ApartadosCrm::firstOrCreate(
+                [
+                    'id_negociacion' => $arrayApartados[$j]['id_negociacion']
+                ],
+                [
+                    'id_negociacion' => $arrayApartados[$j]['id_negociacion'],
+                    'id_lead' => $arrayApartados[$j]['id_lead'],
+                    'nombre_negociacion' => $arrayApartados[$j]['nombre_negociacion'],
+                    'producto1' => $arrayApartados[$j]['producto1'],
+                    'producto2' => $arrayApartados[$j]['producto2'],
+                    'total' => $arrayApartados[$j]['total'],
+                    'precio_producto' => $arrayApartados[$j]['precio_producto'],
+                    'estatus_apartado' => $arrayApartados[$j]['estatus_apartado'],
+                    'id_responsable' => $arrayApartados[$j]['id_responsable']
+                ]
+            );
+
+            // ACTUALIZA LOS REGISTROS DE LA TABLA
+            ApartadosCrm::WHERE('id_negociacion', '=', $arrayApartados[$j]['id_negociacion'])->UPDATE(array(
+                'id_negociacion' => $arrayApartados[$j]['id_negociacion'],
+                'id_lead' => $arrayApartados[$j]['id_lead'],
+                'nombre_negociacion' => $arrayApartados[$j]['nombre_negociacion'],
+                'producto1' => $arrayApartados[$j]['producto1'],
+                'producto2' => $arrayApartados[$j]['producto2'],
+                'total' => $arrayApartados[$j]['total'],
+                'precio_producto' => $arrayApartados[$j]['precio_producto'],
+                'estatus_apartado' => $arrayApartados[$j]['estatus_apartado'],
+                'id_responsable' => $arrayApartados[$j]['id_responsable']
+            ));
+        }
+        return $data;
     }
 
     /**
